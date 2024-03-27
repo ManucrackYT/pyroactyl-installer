@@ -112,46 +112,14 @@ ptdl_dl() {
 
   cp .env.example .env
 
+  npm run build
+
   success "Downloaded pterodactyl panel files!"
 }
 
 pyro_ins(){
-  #!/bin/bash
 
-# Check if npm is already installed
-if command -v npm &> /dev/null; then
-    echo "npm is already installed."
-    exit 0
-fi
 
-# Define the package manager and package installation command
-if [ -x "$(command -v apt)" ]; then
-    PM="apt"
-    INSTALL_CMD="sudo apt update && sudo apt install npm -y"
-elif [ -x "$(command -v yum)" ]; then
-    PM="yum"
-    INSTALL_CMD="sudo yum install -y epel-release && sudo yum install -y npm"
-elif [ -x "$(command -v dnf)" ]; then
-    PM="dnf"
-    INSTALL_CMD="sudo dnf install -y npm"
-else
-    echo "Error: Unsupported package manager." >&2
-    exit 1
-fi
-
-# Install npm using the detected package manager
-echo "Installing npm using $PM..."
-eval $INSTALL_CMD
-
-# Check if npm installation was successful
-if command -v npm &> /dev/null; then
-    echo "npm has been installed successfully."
-else
-    echo "Failed to install npm."
-    exit 1
-fi
-
-npm run build
 
 }
 
