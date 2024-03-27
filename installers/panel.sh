@@ -107,7 +107,7 @@ ptdl_dl() {
   mkdir -p /var/www/pterodactyl
   cd /var/www/pterodactyl || exit
 
-  curl -Lo panel.tar.gz "$PANEL_DL_URL"
+  git clone "$PANEL_DL_URL" /var/www/pterodactyl
   chmod -R 755 storage/* bootstrap/cache/
 
   cp .env.example .env
