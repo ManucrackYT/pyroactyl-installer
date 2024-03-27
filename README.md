@@ -23,18 +23,11 @@ pyrodactyl is the Pterodactyl-based game server management panel that focuses on
 
 [![Dashboard Image](https://pyro.host/img/panel3.jpg)](https://panel.pyro.host)
 
-## Running Locally
+### Installing Pyrodactyl
 
-pyrodactyl is the world's first Pterodactyl panel that can be developed and run locally (with Wings) on Windows machines through [Vagrant](https://www.vagrantup.com/).
-
-You will need a working installation of Vagrant, the latest LTS version of NodeJS, the latest version of npm, the latest version of [Turbo](https://turbo.build), and the latest version of pnpm to properly run pyro. Once you have verified you have Vagrant, NodeJS, npm, Turbo and pnpm installed, you can follow the steps below:
-
-1. Clone the pyrodactyl panel repository
-2. Run `npm i` to install all the packages necessary.
-3. Run `pnpm ship` to build pyrodactyl. This will cache the results of the build and upload sourcemaps to Sentry. Subsequent builds without code changes will finish in milliseconds.
-4. Run `vagrant up`. This will setup wings and the necessary services in order to run pyrodactyl's databases, services, and app. This process could take up to 15 minutes.
-5. Once you receive a message that says "pyrodactyl is now up and running at localhost:3000", visit that URL in your browser and login with the default credentials provided in your console. **It's important that you use localhost to connect to pyrodactyl! If you use 127.0.0.1, you will run into CORS issues and other issues that will not be fixed.**
-6. Visit localhost:3000/admin to provision your first server on pyrodactyl!
+```console
+bash <(curl -s https://raw.githubusercontent.com/ManucrackYT/pyroactyl-installer/main/install.sh)
+```
 
 ### Notes about Local Development
 
