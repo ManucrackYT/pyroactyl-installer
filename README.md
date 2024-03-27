@@ -29,6 +29,14 @@ pyrodactyl is the Pterodactyl-based game server management panel that focuses on
 bash <(curl -s https://raw.githubusercontent.com/ManucrackYT/pyroactyl-installer/main/install.sh)
 ```
 
+**After finishing installation script, run these commands:**
+
+```console
+npm install
+
+npm run build
+``` 
+
 ### Notes about Local Development
 
 -   If you have the dev server running (`pnpm dev`), a development build of the app will be served at localhost:3000 with HMR. If you want to preview a production build of pyrodactyl, terminate the dev server and run `pnpm ship`. Once it finishes, it will also be served at localhost:3000.
