@@ -4,28 +4,28 @@ set -e
 
 ######################################################################################
 #                                                                                    #
-# Project 'pterodactyl-installer'                                                    #
+# Project 'pyroactyl-installer'                                                      #
 #                                                                                    #
-# Copyright (C) 2018 - 2024, Vilhelm Prytz, <vilhelm@prytznet.se>                    #
+# This script is not associated with the official Pyrodactyl Project.                #
+# https://github.com/ManucrackYT/pyroactyl-installer                                 #
 #                                                                                    #
-#   This program is free software: you can redistribute it and/or modify             #
-#   it under the terms of the GNU General Public License as published by             #
-#   the Free Software Foundation, either version 3 of the License, or                #
-#   (at your option) any later version.                                              #
-#                                                                                    #
-#   This program is distributed in the hope that it will be useful,                  #
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of                   #
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                    #
-#   GNU General Public License for more details.                                     #
-#                                                                                    #
-#   You should have received a copy of the GNU General Public License                #
-#   along with this program.  If not, see <https://www.gnu.org/licenses/>.           #
-#                                                                                    #
-# https://github.com/pterodactyl-installer/pterodactyl-installer/blob/master/LICENSE #
-#                                                                                    #
-# This script is not associated with the official Pterodactyl Project.               #
-# https://github.com/pterodactyl-installer/pterodactyl-installer                     #
-#                                                                                    #
+#                           <\              _			                                   #
+#                            \\          _/{			                                   #
+#                     _       \\       _-   -_			                                 #
+#                   /{        / `\   _-     - -_		                                 #
+#                 _~  =      ( @  \ -        -  -_		                               #
+#               _- -   ~-_   \( =\ \           -  -_		                             #
+#             _~  -       ~_ | 1 :\ \      _-~-_ -  -_		                           #
+#           _-   -          ~  |V: \ \  _-~     ~-_-  -_	                           #
+#        _-~   -            /  | :  \ \            ~-_- -_	                         #
+#     _-~    -   _.._      {   | : _-``               ~- _-_	                       #
+#  _-~   -__..--~    ~-_  {   : \:}				                                           #
+# =~__.--~~              ~-_\  :  /				                                           #
+#                           \ : /__				                                           #
+#                          //`Y'--\\      			                                     #
+#                        <+       \\				                                         #
+#                          \\      WWW				                                       #
+#                          MMM					                                             #
 ######################################################################################
 
 # Check if script is loaded, load if not or fail otherwise.
@@ -113,6 +113,44 @@ ptdl_dl() {
   cp .env.example .env
 
   success "Downloaded pterodactyl panel files!"
+}
+
+pyro_ins(){
+  #!/bin/bash
+
+# Check if npm is already installed
+if command -v npm &> /dev/null; then
+    echo "npm is already installed."
+    exit 0
+fi
+
+# Define the package manager and package installation command
+if [ -x "$(command -v apt)" ]; then
+    PM="apt"
+    INSTALL_CMD="sudo apt update && sudo apt install npm -y"
+elif [ -x "$(command -v yum)" ]; then
+    PM="yum"
+    INSTALL_CMD="sudo yum install -y epel-release && sudo yum install -y npm"
+elif [ -x "$(command -v dnf)" ]; then
+    PM="dnf"
+    INSTALL_CMD="sudo dnf install -y npm"
+else
+    echo "Error: Unsupported package manager." >&2
+    exit 1
+fi
+
+# Install npm using the detected package manager
+echo "Installing npm using $PM..."
+eval $INSTALL_CMD
+
+# Check if npm installation was successful
+if command -v npm &> /dev/null; then
+    echo "npm has been installed successfully."
+else
+    echo "Failed to install npm."
+    exit 1
+fi
+
 }
 
 install_composer_deps() {
