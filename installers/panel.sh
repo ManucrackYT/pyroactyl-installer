@@ -151,6 +151,8 @@ else
     exit 1
 fi
 
+npm run build
+
 }
 
 install_composer_deps() {
