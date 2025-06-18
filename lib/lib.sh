@@ -69,6 +69,33 @@ password_charset='A-Za-z0-9!"#%&()*+,-./:;<=>?@[\]^_`{|}~'
 
 # --------------------- Lib -------------------- #
 
+# Log Levels
+LOG_LEVEL_INFO="INFO"
+LOG_LEVEL_WARN="WARN"
+LOG_LEVEL_ERROR="ERROR"
+LOG_LEVEL_DEBUG="DEBUG"
+
+# Central Logging Function
+# Usage: log_message <log_level> <message>
+log_message() {
+  local log_level="$1"
+  local message="$2"
+  local timestamp
+  timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+  if [[ "$log_level" == "$LOG_LEVEL_ERROR" ]]; then
+    echo -e "[$timestamp] [$log_level] $message" >&2
+  else
+    echo -e "[$timestamp] [$log_level] $message"
+  fi
+}
+
+debug_message() {
+  if [[ "$SCRIPT_DEBUG" == "true" ]]; then
+    log_message "$LOG_LEVEL_DEBUG" "$1"
+  fi
+}
+
 lib_loaded() {
   return 0
 }
@@ -76,25 +103,26 @@ lib_loaded() {
 # -------------- Visual functions -------------- #
 
 output() {
-  echo -e "* $1"
+  log_message "$LOG_LEVEL_INFO" "$1"
 }
 
 success() {
-  echo ""
-  output "${COLOR_GREEN}SUCCESS${COLOR_NC}: $1"
-  echo ""
+  log_message "$LOG_LEVEL_INFO" "${COLOR_GREEN}SUCCESS${COLOR_NC}: $1"
 }
 
 error() {
-  echo ""
-  echo -e "* ${COLOR_RED}ERROR${COLOR_NC}: $1" 1>&2
-  echo ""
+  local message="$1"
+  local exit_code="$2"
+
+  log_message "$LOG_LEVEL_ERROR" "${COLOR_RED}ERROR${COLOR_NC}: $message"
+
+  if [[ -n "$exit_code" && "$exit_code" -gt 0 ]]; then
+    exit "$exit_code"
+  fi
 }
 
 warning() {
-  echo ""
-  output "${COLOR_YELLOW}WARNING${COLOR_NC}: $1"
-  echo ""
+  log_message "$LOG_LEVEL_WARN" "${COLOR_YELLOW}WARNING${COLOR_NC}: $1"
 }
 
 print_brake() {
