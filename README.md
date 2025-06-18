@@ -25,9 +25,22 @@ pyrodactyl is the Pterodactyl-based game server management panel that focuses on
 
 ### Installing Pyrodactyl
 
+## Installer Script
+
+The pyrodactyl installer script provides a convenient way to set up the Pterodactyl Panel and Wings on your server. It has been enhanced with several advanced features to make the installation process smoother and more flexible:
+
+*   **Custom Panel Installation Directory**: You can now specify a custom directory where the Pterodactyl Panel files will be installed. The script will prompt you for this path during setup.
+*   **Pre-flight Dependency Checks**: Before installation begins, the script verifies that all essential dependencies (such as PHP, required PHP extensions, Docker, Git, etc.) are present on your system. This helps catch potential issues early.
+*   **Enhanced Logging**: The script features improved logging with timestamps and severity levels (INFO, WARNING, ERROR), all recorded to `/var/log/pyroactyl-installer.log` for easier troubleshooting.
+*   **Clearer Error Messages**: Error handling has been improved to provide more specific messages if something goes wrong.
+*   **Code Refinements**: The script's codebase has been refactored for better readability and maintainability.
+
+To use the installer, run the following command:
 ```console
 bash <(curl -s https://raw.githubusercontent.com/ManucrackYT/pyroactyl-installer/main/install.sh)
 ```
+
+**Note for Pyrodactyl Developers:** The `npm install` and `npm run build` commands mentioned below are for individuals contributing to the pyrodactyl project itself (for building the panel frontend from source) and are not required when using this installer script to set up a standard Pterodactyl Panel and Wings instance.
 
 **After finishing installation script, run these commands:**
 

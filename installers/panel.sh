@@ -36,6 +36,9 @@ if ! fn_exists lib_loaded; then
   ! fn_exists lib_loaded && echo "* ERROR: Could not load lib script" && exit 1
 fi
 
+# Use custom panel installation directory if set, otherwise default
+current_panel_install_dir=${PANEL_INSTALL_DIR:-/var/www/pterodactyl}
+
 # ------------------ Variables ----------------- #
 
 # Domain name / IP
@@ -103,15 +106,16 @@ install_composer() {
 }
 
 ptdl_dl() {
-  output "Downloading pterodactyl panel files .. "
-  mkdir -p /var/www/pterodactyl
-  cd /var/www/pterodactyl || exit
+  output "Downloading pterodactyl panel files to $current_panel_install_dir..."
+  mkdir -p "$current_panel_install_dir"
+  cd "$current_panel_install_dir" || { error "Failed to cd to $current_panel_install_dir"; exit 1; }
 
-  git clone "$PANEL_DL_URL" /var/www/pterodactyl
+  git clone "$PANEL_DL_URL" . # Clone to current directory
   chmod -R 755 storage/* bootstrap/cache/
 
   cp .env.example .env
 
+  # Assuming npm run build should also be run from the panel directory
   npm run build
 
   success "Downloaded pterodactyl panel files!"
@@ -124,7 +128,8 @@ pyro_ins(){
 }
 
 install_composer_deps() {
-  output "Installing composer dependencies.."
+  output "Installing composer dependencies in $current_panel_install_dir..."
+  cd "$current_panel_install_dir" || { error "Failed to cd to $current_panel_install_dir for composer"; exit 1; }
   [ "$OS" == "rocky" ] || [ "$OS" == "almalinux" ] && export PATH=/usr/local/bin:$PATH
   COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader
   success "Installed composer dependencies!"
@@ -132,7 +137,8 @@ install_composer_deps() {
 
 # Configure environment
 configure() {
-  output "Configuring environment.."
+  output "Configuring environment in $current_panel_install_dir..."
+  cd "$current_panel_install_dir" || { error "Failed to cd to $current_panel_install_dir for environment configuration"; exit 1; }
 
   local app_url="http://$FQDN"
   [ "$ASSUME_SSL" == true ] && app_url="https://$FQDN"
@@ -179,32 +185,38 @@ configure() {
 
 # set the correct folder permissions depending on OS and webserver
 set_folder_permissions() {
+  local target_dir="$1"
+  output "Setting permissions for $target_dir..."
   # if os is ubuntu or debian, we do this
   case "$OS" in
   debian | ubuntu)
-    chown -R www-data:www-data ./*
+    chown -R www-data:www-data "$target_dir"/*
     ;;
   rocky | almalinux)
-    chown -R nginx:nginx ./*
+    chown -R nginx:nginx "$target_dir"/*
     ;;
   esac
+  success "Folder permissions set for $target_dir!"
 }
 
 insert_cronjob() {
-  output "Installing cronjob.. "
+  output "Installing cronjob for $current_panel_install_dir..."
 
   crontab -l | {
     cat
-    output "* * * * php /var/www/pterodactyl/artisan schedule:run >> /dev/null 2>&1"
+    output "* * * * php $current_panel_install_dir/artisan schedule:run >> /dev/null 2>&1"
   } | crontab -
 
   success "Cronjob installed!"
 }
 
 install_pteroq() {
-  output "Installing pteroq service.."
+  output "Installing pteroq service (artisan path: $current_panel_install_dir/artisan)..."
 
   curl -o /etc/systemd/system/pteroq.service "$GITHUB_URL"/configs/pteroq.service
+
+  # Replace path to artisan in pteroq.service
+  sed -i -e "s@/var/www/pterodactyl/artisan@$current_panel_install_dir/artisan@g" /etc/systemd/system/pteroq.service
 
   case "$OS" in
   debian | ubuntu)
@@ -400,7 +412,8 @@ configure_nginx() {
   curl -o "$CONFIG_PATH_AVAIL"/pterodactyl.conf "$GITHUB_URL"/configs/$DL_FILE
 
   sed -i -e "s@<domain>@${FQDN}@g" "$CONFIG_PATH_AVAIL"/pterodactyl.conf
-
+  # Replace the pterodactyl root path placeholder
+  sed -i -e "s@<pterodactyl_root_path>@$current_panel_install_dir@g" "$CONFIG_PATH_AVAIL"/pterodactyl.conf
   sed -i -e "s@<php_socket>@${PHP_SOCKET}@g" "$CONFIG_PATH_AVAIL"/pterodactyl.conf
 
   case "$OS" in
@@ -427,7 +440,7 @@ perform_install() {
   create_db_user "$MYSQL_USER" "$MYSQL_PASSWORD"
   create_db "$MYSQL_DB" "$MYSQL_USER"
   configure
-  set_folder_permissions
+  set_folder_permissions "$current_panel_install_dir" # Pass the directory
   insert_cronjob
   install_pteroq
   configure_nginx
